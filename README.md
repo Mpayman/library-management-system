@@ -1,19 +1,18 @@
  # Stacks & Stories Library Management System
-
-This project is a Flask-based library management system built for a Python class project. It supports librarian and member workflows for catalog management, member accounts, book checkout and return, search, borrowing history, and role-based authentication.
+ The project is a Flask library management system that was developed as a project with a Python course. It supports librarian and member workflows to support catalog management, member accounts, book checkout and return, search, borrowing history, and role based authentication.
 
 ## Features
 
-- Role-based authentication for `admin`, `librarian`, and `member`
-- Public-facing catalog browsing with search by title, author, language, year, and availability
-- Book management for staff: add, edit, and track copies
-- Member management for staff: create, edit, activate, and deactivate accounts
-- Checkout and return workflows
-- Loan history for both books and members
-- JSON API endpoints for books, members, and loans
-- SQLite database with normalized tables for users, authors, books, and loans
-- Unit and integration tests with `pytest`
-- A teaching folder with architecture notes and presentation help
+- Authentication of role of the user; the user is the administrator, librarian, and the member.
+- Catalogue browsing, with search by title, author, language, year and availability, visible to the public.
+- Staff book management: add, edit, and monitor copies.
+- Staff member management: create, edit, activate, and deactivate accounts.
+- Checkout and turnaround processes.
+- Loan history of books and members.
+- JSON API book, members, and loans endpoints.
+- SQLite database containing normalized users, authors, books and loans tables.
+- Unit tests and integration tests using pytest.
+- Teaching folder containing architecture notes and presentation aid.
 
 ## Project Structure
 
@@ -111,4 +110,4 @@ pytest
 
 - The application uses SQLite for easy classroom setup and submission.
 - New public registrations become `member` accounts automatically.
-- Staff members can create librarian and member accounts, while only admins can assign the admin role.
+- The staff members have the ability to create librarian and member accounts, whilst only admins can grant the role of admins.
