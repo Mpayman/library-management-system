@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Register | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="form-shell">
+    <div class="form-intro">
+        <p class="eyebrow">Membership</p>
+        <h1>Create a new library member account</h1>
+        <p>New public registrations are created as member accounts.</p>
+    </div>
+
+    <form method="post" class="form-card two-column-form">
+        <label>
+            <span>Full Name</span>
+            <input type="text" name="full_name" required>
+        </label>
+        <label>
+            <span>Email</span>
+            <input type="email" name="email" required>
+        </label>
+        <label>
+            <span>Phone</span>
+            <input type="text" name="phone" placeholder="+93 ...">
+        </label>
+        <label>
+            <span>Student ID</span>
+            <input type="text" name="student_id" placeholder="Optional">
+        </label>
+        <label class="full-width">
+            <span>Password</span>
+            <input type="password" name="password" minlength="6" required>
+        </label>
+        <button type="submit" class="button full-width">Create Account</button>
+    </form>
+</section>
+{% endblock %}
