@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Profile | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="form-shell">
+    <div class="form-intro">
+        <p class="eyebrow">Account</p>
+        <h1>Update your profile</h1>
+        <p>Keep your member information current and optionally change your password.</p>
+    </div>
+
+    <form method="post" class="form-card two-column-form">
+        <label>
+            <span>Full Name</span>
+            <input type="text" name="full_name" value="{{ current_user.full_name }}" required>
+        </label>
+        <label>
+            <span>Email</span>
+            <input type="email" value="{{ current_user.email }}" disabled>
+        </label>
+        <label>
+            <span>Phone</span>
+            <input type="text" name="phone" value="{{ current_user.phone or '' }}">
+        </label>
+        <label>
+            <span>Student ID</span>
+            <input type="text" name="student_id" value="{{ current_user.student_id or '' }}">
+        </label>
+        <label class="full-width">
+            <span>New Password</span>
+            <input type="password" name="password" minlength="6" placeholder="Leave blank to keep current password">
+        </label>
+        <button type="submit" class="button full-width">Save Profile</button>
+    </form>
+</section>
+{% endblock %}
