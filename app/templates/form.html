@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}{% if member %}Edit Member{% else %}Add Member{% endif %} | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="form-shell">
+    <div class="form-intro">
+        <p class="eyebrow">Member Form</p>
+        <h1>{% if member %}Edit member account{% else %}Create a member account{% endif %}</h1>
+        <p>Staff can register members, librarians, and administrators based on permissions.</p>
+    </div>
+
+    <form method="post" class="form-card two-column-form">
+        <label>
+            <span>Full Name</span>
+            <input type="text" name="full_name" value="{{ member.full_name if member else '' }}" required>
+        </label>
+        <label>
+            <span>Email</span>
+            <input type="email" name="email" value="{{ member.email if member else '' }}" required>
+        </label>
+        <label>
+            <span>Phone</span>
+            <input type="text" name="phone" value="{{ member.phone if member else '' }}">
+        </label>
+        <label>
+            <span>Student ID</span>
+            <input type="text" name="student_id" value="{{ member.student_id if member else '' }}">
+        </label>
+        <label>
+            <span>Role</span>
+            <select name="role" required>
+                {% set current_role = member.role if member else 'member' %}
+                <option value="member" {% if current_role == 'member' %}selected{% endif %}>Member</option>
+                <option value="librarian" {% if current_role == 'librarian' %}selected{% endif %}>Librarian</option>
+                {% if current_user.role == 'admin' or current_role == 'admin' %}
+                    <option value="admin" {% if current_role == 'admin' %}selected{% endif %}>Admin</option>
+                {% endif %}
+            </select>
+        </label>
+        <label>
+            <span>Password {% if member %}(optional){% endif %}</span>
+            <input type="password" name="password" {% if not member %}required{% endif %} minlength="6">
+        </label>
+        <label class="checkbox-row full-width">
+            <input type="checkbox" name="is_active_account" {% if not member or member.is_active_account %}checked{% endif %}>
+            <span>Account is active</span>
+        </label>
+        <button type="submit" class="button full-width">{% if member %}Save Changes{% else %}Create Account{% endif %}</button>
+    </form>
+</section>
+{% endblock %}
