@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="section-header">
+    <div>
+        <p class="eyebrow">Overview</p>
+        <h1>{{ current_user.full_name.split(' ')[0] }}'s Dashboard</h1>
+    </div>
+    <div class="action-row">
+        <a class="button button-small" href="{{ url_for('books.list_books') }}">Find Books</a>
+        {% if current_user.is_staff %}
+            <a class="button button-small button-secondary" href="{{ url_for('books.add_book') }}">Add Book</a>
+            <a class="button button-small button-secondary" href="{{ url_for('members.add_member') }}">Add Member</a>
+        {% endif %}
+    </div>
+</section>
+
+<section class="stats-grid">
+    {% for label, value in stats.items() %}
+        <article class="stat-card">
+            <p>{{ label.replace('_', ' ').title() }}</p>
+            <h2>{{ value }}</h2>
+        </article>
+    {% endfor %}
+</section>
+
+<section class="two-column">
+    <article class="panel">
+        <div class="panel-heading">
+            <h2>Recent Loans</h2>
+            <a href="{{ url_for('loans.history') }}">View history</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        {% if current_user.is_staff %}<th>Member</th>{% endif %}
+                        <th>Status</th>
+                        <th>Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in recent_loans %}
+                        <tr>
+                            <td>{{ loan.book.title }}</td>
+                            {% if current_user.is_staff %}<td>{{ loan.member.full_name }}</td>{% endif %}
+                            <td>
+                                <span class="badge {% if loan.returned_at %}badge-muted{% elif loan.is_overdue %}badge-danger{% else %}badge-success{% endif %}">
+                                    {% if loan.returned_at %}Returned{% elif loan.is_overdue %}Overdue{% else %}Active{% endif %}
+                                </span>
+                            </td>
+                            <td>{{ loan.due_at.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="{% if current_user.is_staff %}4{% else %}3{% endif %}">No loan activity yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-heading">
+            <h2>Recent Books</h2>
+            <a href="{{ url_for('books.list_books') }}">Open catalog</a>
+        </div>
+        <div class="book-stack">
+            {% for book in recent_books %}
+                <a class="stack-item" href="{{ url_for('books.book_detail', book_id=book.id) }}">
+                    <div>
+                        <strong>{{ book.title }}</strong>
+                        <span>{{ book.author.name }}</span>
+                    </div>
+                    <small>{{ book.available_copies }}/{{ book.total_copies }} available</small>
+                </a>
+            {% else %}
+                <p>No books available yet.</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

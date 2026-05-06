@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Flask Class Project</p>
+        <h1>Run a library with one clean, teachable workflow.</h1>
+        <p class="hero-text">
+            This project helps librarians and members manage books, checkouts, returns,
+            search, user accounts, and borrowing history from a single Flask application.
+        </p>
+        <div class="hero-actions">
+            {% if current_user.is_authenticated %}
+                <a class="button" href="{{ url_for('main.dashboard') }}">Open Dashboard</a>
+            {% else %}
+                <a class="button" href="{{ url_for('auth.login') }}">Sign In</a>
+                <a class="button button-secondary" href="{{ url_for('auth.register') }}">Create Member Account</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <aside class="hero-panel">
+        <h2>Demo Accounts</h2>
+        <div class="credential-card">
+            <strong>Admin</strong>
+            <code>admin@library.local</code>
+            <code>admin123</code>
+        </div>
+        <div class="credential-card">
+            <strong>Librarian</strong>
+            <code>librarian@library.local</code>
+            <code>librarian123</code>
+        </div>
+        <div class="credential-card">
+            <strong>Member</strong>
+            <code>member1@library.local</code>
+            <code>member123</code>
+        </div>
+    </aside>
+</section>
+
+<section class="card-grid">
+    <article class="info-card">
+        <h3>Book Catalog</h3>
+        <p>Add books, edit records, track copies, and search by title, author, year, and language.</p>
+    </article>
+    <article class="info-card">
+        <h3>Member Management</h3>
+        <p>Register members, edit profiles, activate or deactivate accounts, and assign library roles.</p>
+    </article>
+    <article class="info-card">
+        <h3>Loan Tracking</h3>
+        <p>Check books out and back in while keeping a full history of who borrowed what and when.</p>
+    </article>
+</section>
+
+<section class="section-header">
+    <div>
+        <p class="eyebrow">Featured Books</p>
+        <h2>Recently added to the collection</h2>
+    </div>
+    <a class="button button-small button-secondary" href="{{ url_for('books.list_books') }}">Browse all books</a>
+</section>
+
+<section class="book-grid">
+    {% for book in featured_books %}
+        <article class="book-card">
+            <p class="book-card-meta">{{ book.author.name }}</p>
+            <h3>{{ book.title }}</h3>
+            <p>{{ book.description or "A library title ready for browsing and checkout." }}</p>
+            <div class="book-card-footer">
+                <span>{{ book.language }} | {{ book.publication_year }}</span>
+                <a href="{{ url_for('books.book_detail', book_id=book.id) }}">Details</a>
+            </div>
+        </article>
+    {% else %}
+        <article class="empty-state">
+            <h3>No books yet</h3>
+            <p>Seed the demo data to see example books on the home page.</p>
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}
