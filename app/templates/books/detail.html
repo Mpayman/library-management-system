@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="section-header">
+    <div>
+        <p class="eyebrow">{{ book.category or "Library Book" }}</p>
+        <h1>{{ book.title }}</h1>
+        <p class="muted">{{ book.author.name }} | {{ book.language }} | {{ book.publication_year }}</p>
+    </div>
+    {% if current_user.is_authenticated and current_user.is_staff %}
+        <a class="button button-small" href="{{ url_for('books.edit_book', book_id=book.id) }}">Edit Book</a>
+    {% endif %}
+</section>
+
+<section class="two-column">
+    <article class="panel">
+        <h2>Book Details</h2>
+        <dl class="detail-grid">
+            <div><dt>ISBN</dt><dd>{{ book.isbn or "Not provided" }}</dd></div>
+            <div><dt>Language</dt><dd>{{ book.language }}</dd></div>
+            <div><dt>Shelf</dt><dd>{{ book.shelf_location or "Not assigned" }}</dd></div>
+            <div><dt>Availability</dt><dd>{{ book.available_copies }}/{{ book.total_copies }} available</dd></div>
+        </dl>
+        <p>{{ book.description or "No description has been added for this title yet." }}</p>
+    </article>
+
+    <article class="panel">
+        <h2>Borrow or Return</h2>
+        {% if current_user.is_authenticated %}
+            {% if book.available_copies > 0 %}
+                <form method="post" action="{{ url_for('books.checkout', book_id=book.id) }}" class="form-card compact-form">
+                    {% if current_user.is_staff %}
+                        <label>
+                            <span>Member</span>
+                            <select name="member_id" required>
+                                <option value="">Choose a member</option>
+                                {% for member in members %}
+                                    <option value="{{ member.id }}">{{ member.full_name }} ({{ member.email }})</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    {% endif %}
+                    <label>
+                        <span>Notes</span>
+                        <textarea name="notes" rows="3" placeholder="Optional checkout notes"></textarea>
+                    </label>
+                    <button type="submit" class="button">Check Out Book</button>
+                </form>
+            {% else %}
+                <p class="empty-note">All copies are currently checked out.</p>
+            {% endif %}
+        {% else %}
+            <p class="empty-note">Sign in to borrow or manage this book.</p>
+        {% endif %}
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Borrower</th>
+                        <th>Checked Out</th>
+                        <th>Due</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in active_loans %}
+                        <tr>
+                            <td>{{ loan.member.full_name }}</td>
+                            <td>{{ loan.checked_out_at.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ loan.due_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                {% if current_user.is_authenticated and (current_user.is_staff or current_user.id == loan.member_id) %}
+                                    <form method="post" action="{{ url_for('books.check_in', book_id=book.id, loan_id=loan.id) }}">
+                                        <button type="submit" class="button button-small button-secondary">Return</button>
+                                    </form>
+                                {% else %}
+                                    <span class="muted">Managed by staff</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No active loans for this book.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h2>Recent Loan History</h2>
+        <a href="{{ url_for('loans.history') }}">Open full history</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Checked Out</th>
+                    <th>Returned</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in recent_history %}
+                    <tr>
+                        <td>{{ loan.member.full_name }}</td>
+                        <td>{{ loan.checked_out_at.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ loan.returned_at.strftime('%Y-%m-%d') if loan.returned_at else "Not yet" }}</td>
+                        <td>{{ "Returned" if loan.returned_at else "Active" }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">No history available yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

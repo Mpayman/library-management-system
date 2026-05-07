@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Books | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="section-header">
+    <div>
+        <p class="eyebrow">Catalog</p>
+        <h1>Search and manage books</h1>
+    </div>
+    {% if current_user.is_authenticated and current_user.is_staff %}
+        <a class="button button-small" href="{{ url_for('books.add_book') }}">Add New Book</a>
+    {% endif %}
+</section>
+
+<form method="get" class="filter-card">
+    <label>
+        <span>Title</span>
+        <input type="text" name="title" value="{{ request.args.get('title', '') }}">
+    </label>
+    <label>
+        <span>Author</span>
+        <input type="text" name="author" value="{{ request.args.get('author', '') }}">
+    </label>
+    <label>
+        <span>Language</span>
+        <input type="text" name="language" value="{{ request.args.get('language', '') }}">
+    </label>
+    <label>
+        <span>Year</span>
+        <input type="number" name="year" value="{{ request.args.get('year', '') }}">
+    </label>
+    <label>
+        <span>Availability</span>
+        <select name="availability">
+            <option value="">Any</option>
+            <option value="available" {% if request.args.get('availability') == 'available' %}selected{% endif %}>Available</option>
+            <option value="checked_out" {% if request.args.get('availability') == 'checked_out' %}selected{% endif %}>Fully Checked Out</option>
+        </select>
+    </label>
+    <div class="action-row">
+        <button type="submit" class="button button-small">Search</button>
+        <a class="button button-small button-secondary" href="{{ url_for('books.list_books') }}">Reset</a>
+    </div>
+</form>
+
+<section class="book-grid">
+    {% for book in books %}
+        <article class="book-card">
+            <p class="book-card-meta">{{ book.author.name }} | {{ book.category or "General Collection" }}</p>
+            <h2>{{ book.title }}</h2>
+            <p>{{ book.description or "No description added yet." }}</p>
+            <div class="book-card-footer">
+                <span>{{ book.available_copies }}/{{ book.total_copies }} available</span>
+                <a href="{{ url_for('books.book_detail', book_id=book.id) }}">Details</a>
+            </div>
+        </article>
+    {% else %}
+        <article class="empty-state">
+            <h3>No matching books found</h3>
+            <p>Try adjusting the search filters or add a new title to the catalog.</p>
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}

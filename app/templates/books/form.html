@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}{% if book %}Edit Book{% else %}Add Book{% endif %} | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="form-shell">
+    <div class="form-intro">
+        <p class="eyebrow">Catalog Form</p>
+        <h1>{% if book %}Edit book details{% else %}Add a new book{% endif %}</h1>
+        <p>Keep bibliographic data and copy counts accurate for a reliable checkout workflow.</p>
+    </div>
+
+    <form method="post" class="form-card two-column-form">
+        <label>
+            <span>Title</span>
+            <input type="text" name="title" value="{{ book.title if book else '' }}" required>
+        </label>
+        <label>
+            <span>Author</span>
+            <input type="text" name="author" value="{{ book.author.name if book else '' }}" required>
+        </label>
+        <label>
+            <span>Publication Year</span>
+            <input type="number" name="publication_year" value="{{ book.publication_year if book else '' }}" required>
+        </label>
+        <label>
+            <span>Language</span>
+            <input type="text" name="language" value="{{ book.language if book else '' }}" required>
+        </label>
+        <label>
+            <span>ISBN</span>
+            <input type="text" name="isbn" value="{{ book.isbn if book else '' }}">
+        </label>
+        <label>
+            <span>Category</span>
+            <input type="text" name="category" value="{{ book.category if book else '' }}">
+        </label>
+        <label>
+            <span>Shelf Location</span>
+            <input type="text" name="shelf_location" value="{{ book.shelf_location if book else '' }}">
+        </label>
+        <label>
+            <span>Total Copies</span>
+            <input type="number" name="total_copies" min="1" value="{{ book.total_copies if book else '1' }}" required>
+        </label>
+        <label>
+            <span>Available Copies</span>
+            <input type="number" name="available_copies" min="0" value="{{ book.available_copies if book else '1' }}">
+        </label>
+        <label class="full-width">
+            <span>Description</span>
+            <textarea name="description" rows="4">{{ book.description if book else '' }}</textarea>
+        </label>
+        <p class="form-note full-width">If the book already has active loans, available copies are calculated automatically.</p>
+        <button type="submit" class="button full-width">{% if book %}Save Changes{% else %}Add Book{% endif %}</button>
+    </form>
+</section>
+{% endblock %}
