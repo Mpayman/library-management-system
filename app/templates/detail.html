@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ member.full_name }} | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="section-header">
+    <div>
+        <p class="eyebrow">Member Record</p>
+        <h1>{{ member.full_name }}</h1>
+        <p class="muted">{{ member.role.title() }} | {{ "Active" if member.is_active_account else "Inactive" }}</p>
+    </div>
+    <a class="button button-small" href="{{ url_for('members.edit_member', user_id=member.id) }}">Edit Member</a>
+</section>
+
+<section class="two-column">
+    <article class="panel">
+        <h2>Contact Information</h2>
+        <dl class="detail-grid">
+            <div><dt>Email</dt><dd>{{ member.email }}</dd></div>
+            <div><dt>Phone</dt><dd>{{ member.phone or "Not provided" }}</dd></div>
+            <div><dt>Student ID</dt><dd>{{ member.student_id or "Not provided" }}</dd></div>
+            <div><dt>Joined</dt><dd>{{ member.created_at.strftime('%Y-%m-%d') }}</dd></div>
+        </dl>
+    </article>
+
+    <article class="panel">
+        <h2>Loan Snapshot</h2>
+        <dl class="detail-grid">
+            <div><dt>Active Loans</dt><dd>{{ member.borrowed_loans.filter_by(returned_at=None).count() }}</dd></div>
+            <div><dt>Total History</dt><dd>{{ member.borrowed_loans.count() }}</dd></div>
+        </dl>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h2>Recent Borrowing History</h2>
+        <a href="{{ url_for('loans.history', member=member.full_name) }}">Filter in history</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Checked Out</th>
+                    <th>Returned</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in recent_loans %}
+                    <tr>
+                        <td>{{ loan.book.title }}</td>
+                        <td>{{ loan.checked_out_at.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ loan.returned_at.strftime('%Y-%m-%d') if loan.returned_at else "Not yet" }}</td>
+                        <td>{{ "Returned" if loan.returned_at else "Active" }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">No borrowing history yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
