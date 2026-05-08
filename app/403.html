@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Access Denied | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="empty-state">
+    <h1>403</h1>
+    <p>You do not have permission to open this page.</p>
+    <a class="button" href="{{ url_for('main.index') }}">Return Home</a>
+</section>
+{% endblock %}
