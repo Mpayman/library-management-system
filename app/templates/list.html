@@ -1,45 +1,30 @@
 {% extends "base.html" %}
 
-{% block title %}Members | Stacks & Stories{% endblock %}
+{% block title %}Active Loans | Stacks & Stories{% endblock %}
 
 {% block content %}
 <section class="section-header">
     <div>
-        <p class="eyebrow">Membership</p>
-        <h1>Library members and staff</h1>
+        <p class="eyebrow">Loans</p>
+        <h1>Active checkouts</h1>
     </div>
-    <a class="button button-small" href="{{ url_for('members.add_member') }}">Add Member</a>
+    <a class="button button-small button-secondary" href="{{ url_for('loans.history') }}">Open History</a>
 </section>
 
 <form method="get" class="filter-card">
     <label>
-        <span>Name</span>
-        <input type="text" name="name" value="{{ request.args.get('name', '') }}">
+        <span>Book Title</span>
+        <input type="text" name="title" value="{{ request.args.get('title', '') }}">
     </label>
-    <label>
-        <span>Email</span>
-        <input type="text" name="email" value="{{ request.args.get('email', '') }}">
-    </label>
-    <label>
-        <span>Role</span>
-        <select name="role">
-            <option value="">Any</option>
-            <option value="member" {% if request.args.get('role') == 'member' %}selected{% endif %}>Member</option>
-            <option value="librarian" {% if request.args.get('role') == 'librarian' %}selected{% endif %}>Librarian</option>
-            <option value="admin" {% if request.args.get('role') == 'admin' %}selected{% endif %}>Admin</option>
-        </select>
-    </label>
-    <label>
-        <span>Active</span>
-        <select name="active">
-            <option value="">Any</option>
-            <option value="yes" {% if request.args.get('active') == 'yes' %}selected{% endif %}>Active</option>
-            <option value="no" {% if request.args.get('active') == 'no' %}selected{% endif %}>Inactive</option>
-        </select>
-    </label>
+    {% if current_user.is_staff %}
+        <label>
+            <span>Member</span>
+            <input type="text" name="member" value="{{ request.args.get('member', '') }}">
+        </label>
+    {% endif %}
     <div class="action-row">
-        <button type="submit" class="button button-small">Search</button>
-        <a class="button button-small button-secondary" href="{{ url_for('members.list_members') }}">Reset</a>
+        <button type="submit" class="button button-small">Filter</button>
+        <a class="button button-small button-secondary" href="{{ url_for('loans.active_loans') }}">Reset</a>
     </div>
 </form>
 
@@ -48,29 +33,29 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
+                    <th>Book</th>
+                    {% if current_user.is_staff %}<th>Member</th>{% endif %}
+                    <th>Checked Out</th>
+                    <th>Due Date</th>
                     <th>Status</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for member in members %}
+                {% for loan in loans %}
                     <tr>
-                        <td>{{ member.full_name }}</td>
-                        <td>{{ member.email }}</td>
-                        <td>{{ member.role.title() }}</td>
-                        <td>{{ "Active" if member.is_active_account else "Inactive" }}</td>
+                        <td>{{ loan.book.title }}</td>
+                        {% if current_user.is_staff %}<td>{{ loan.member.full_name }}</td>{% endif %}
+                        <td>{{ loan.checked_out_at.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ loan.due_at.strftime('%Y-%m-%d') }}</td>
                         <td>
-                            <a href="{{ url_for('members.member_detail', user_id=member.id) }}">View</a>
-                            <span class="muted">|</span>
-                            <a href="{{ url_for('members.edit_member', user_id=member.id) }}">Edit</a>
+                            <span class="badge {% if loan.is_overdue %}badge-danger{% else %}badge-success{% endif %}">
+                                {% if loan.is_overdue %}Overdue{% else %}On Loan{% endif %}
+                            </span>
                         </td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="5">No members matched your search.</td>
+                        <td colspan="{% if current_user.is_staff %}5{% else %}4{% endif %}">No active loans found.</td>
                     </tr>
                 {% endfor %}
             </tbody>
