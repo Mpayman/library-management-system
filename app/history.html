@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Loan History | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="section-header">
+    <div>
+        <p class="eyebrow">History</p>
+        <h1>Checkout and return history</h1>
+    </div>
+    <a class="button button-small button-secondary" href="{{ url_for('loans.active_loans') }}">View Active Loans</a>
+</section>
+
+<form method="get" class="filter-card">
+    <label>
+        <span>Book Title</span>
+        <input type="text" name="title" value="{{ request.args.get('title', '') }}">
+    </label>
+    {% if current_user.is_staff %}
+        <label>
+            <span>Member</span>
+            <input type="text" name="member" value="{{ request.args.get('member', '') }}">
+        </label>
+    {% endif %}
+    <label>
+        <span>Status</span>
+        <select name="status">
+            <option value="">Any</option>
+            <option value="active" {% if request.args.get('status') == 'active' %}selected{% endif %}>Active</option>
+            <option value="returned" {% if request.args.get('status') == 'returned' %}selected{% endif %}>Returned</option>
+        </select>
+    </label>
+    <div class="action-row">
+        <button type="submit" class="button button-small">Filter</button>
+        <a class="button button-small button-secondary" href="{{ url_for('loans.history') }}">Reset</a>
+    </div>
+</form>
+
+<section class="panel">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    {% if current_user.is_staff %}<th>Member</th>{% endif %}
+                    <th>Checked Out</th>
+                    <th>Returned</th>
+                    <th>Processed By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in loans %}
+                    <tr>
+                        <td>{{ loan.book.title }}</td>
+                        {% if current_user.is_staff %}<td>{{ loan.member.full_name }}</td>{% endif %}
+                        <td>{{ loan.checked_out_at.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ loan.returned_at.strftime('%Y-%m-%d') if loan.returned_at else "Still on loan" }}</td>
+                        <td>
+                            {{ loan.checked_out_by.full_name }}
+                            {% if loan.returned_by %}
+                                / {{ loan.returned_by.full_name }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="{% if current_user.is_staff %}5{% else %}4{% endif %}">No loan history found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
