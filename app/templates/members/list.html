@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Members | Stacks & Stories{% endblock %}
+
+{% block content %}
+<section class="section-header">
+    <div>
+        <p class="eyebrow">Membership</p>
+        <h1>Library members and staff</h1>
+    </div>
+    <a class="button button-small" href="{{ url_for('members.add_member') }}">Add Member</a>
+</section>
+
+<form method="get" class="filter-card">
+    <label>
+        <span>Name</span>
+        <input type="text" name="name" value="{{ request.args.get('name', '') }}">
+    </label>
+    <label>
+        <span>Email</span>
+        <input type="text" name="email" value="{{ request.args.get('email', '') }}">
+    </label>
+    <label>
+        <span>Role</span>
+        <select name="role">
+            <option value="">Any</option>
+            <option value="member" {% if request.args.get('role') == 'member' %}selected{% endif %}>Member</option>
+            <option value="librarian" {% if request.args.get('role') == 'librarian' %}selected{% endif %}>Librarian</option>
+            <option value="admin" {% if request.args.get('role') == 'admin' %}selected{% endif %}>Admin</option>
+        </select>
+    </label>
+    <label>
+        <span>Active</span>
+        <select name="active">
+            <option value="">Any</option>
+            <option value="yes" {% if request.args.get('active') == 'yes' %}selected{% endif %}>Active</option>
+            <option value="no" {% if request.args.get('active') == 'no' %}selected{% endif %}>Inactive</option>
+        </select>
+    </label>
+    <div class="action-row">
+        <button type="submit" class="button button-small">Search</button>
+        <a class="button button-small button-secondary" href="{{ url_for('members.list_members') }}">Reset</a>
+    </div>
+</form>
+
+<section class="panel">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                    <tr>
+                        <td>{{ member.full_name }}</td>
+                        <td>{{ member.email }}</td>
+                        <td>{{ member.role.title() }}</td>
+                        <td>{{ "Active" if member.is_active_account else "Inactive" }}</td>
+                        <td>
+                            <a href="{{ url_for('members.member_detail', user_id=member.id) }}">View</a>
+                            <span class="muted">|</span>
+                            <a href="{{ url_for('members.edit_member', user_id=member.id) }}">Edit</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">No members matched your search.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
